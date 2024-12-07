@@ -26,6 +26,11 @@ const corsOption = {
 app.use(cors(corsOption));
 
 
+// comments:
+// comment 1
+// comment 2
+// comment 3
+
 // route:
 app.get("/", (req,res)=>{
     return res.status(200).json({
