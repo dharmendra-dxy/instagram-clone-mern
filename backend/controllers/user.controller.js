@@ -33,7 +33,7 @@ export const handleUserRegister = async (req,res)=>{
         await User.create({
             username,
             email,
-            password,
+            password : hashedPassword,
         });
 
         return res.status(201).json({
@@ -61,7 +61,7 @@ export const handleUserLogin = async (req,res) => {
             });
         }
 
-        let user = User.findOne({email});
+        let user = await User.findOne({email});
         if(!user){
             return res.status(401).json({
                 message: "incorrect email or password",
@@ -80,7 +80,7 @@ export const handleUserLogin = async (req,res) => {
 
         // user object to be handled in front-end:
         user = {
-            _id: user_id,
+            _id: user._id,
             username: user.username,
             email: user.email,
             profilePicture: user.profilePicture,
@@ -94,7 +94,7 @@ export const handleUserLogin = async (req,res) => {
 
         // if user has correct email and pass:
         // create token:
-        const token = await jwt.sign({userId: user._id}, process.env.SECRET_KEY, {expiresIn: '1d '});
+        const token = await jwt.sign({userId: user._id}, process.env.SECRET_KEY, {expiresIn: '1d'});
 
         // set cookies and return:
         return res.cookie('token', token, {httpOnly: true, sameSite:'strict', maxAge:1*24*60*60*1000}).json({
