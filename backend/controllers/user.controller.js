@@ -6,8 +6,8 @@ import getDataUri from "../utils/datauri.utils.js";
 import cloudinary from "../utils/coudinary.js";
 
 
-// handleUserRegister:
-export const handleUserRegister = async (req,res)=>{
+// handlePostUserRegister:
+export const handlePostUserRegister = async (req,res)=>{
     try {
         const {username, email, password} = req.body;
 
@@ -48,8 +48,8 @@ export const handleUserRegister = async (req,res)=>{
 }
 
 
-// handleUserLogin:
-export const handleUserLogin = async (req,res) => {
+// handlePostUserLogin:
+export const handlePostUserLogin = async (req,res) => {
     try {
         
         const {email, password} =  req.body;
@@ -110,8 +110,8 @@ export const handleUserLogin = async (req,res) => {
 }
 
 
-// handleUserLogout:
-export const handleUserLogout = async (req,res) => {
+// handleGetUserLogout:
+export const handleGetUserLogout = async (req,res) => {
     try {
         return res.cookie('token', "", {maxAge: 0}).json({
             message: "Logged Out Successfully",
@@ -122,11 +122,11 @@ export const handleUserLogout = async (req,res) => {
     }
 }
 
-// handleUserGetProfile:
-export const handleUserGetProfile = async (req,res) => {
+// handleGetUserGetProfile:
+export const handleGetUserGetProfile = async (req,res) => {
     try {
         const userId = req.params.id;
-        let user = User.findById(userId);
+        let user = await User.findById(userId).select('-password');
 
         return res.status(201).json({
             user,
@@ -138,11 +138,12 @@ export const handleUserGetProfile = async (req,res) => {
     }
 }
 
-// handleUserEditProfile:
-export const handleUserEditProfile = async (req,res) => {
+// handlePostUserEditProfile:
+export const handlePostUserEditProfile = async (req,res) => {
     try {
 
         // get user through token: -> middleware - isAuthenticated
+        // userId will get from middlewares in req.id
         const userId = req.id;
 
         const {bio, gender}= req.body;
@@ -156,7 +157,7 @@ export const handleUserEditProfile = async (req,res) => {
             cloudResponse = await cloudinary.uploader.upload(fileUri);
         }
 
-        const user = User.findById(userId);
+        const user = await User.findById(userId).select('-password');
         if(!user){
             return res.status(401).json({
                 message: "user not found",
@@ -206,8 +207,8 @@ export const handleGetSuggestedUser = async (req,res) => {
 }
 
 
-// handleUserFollowAndUnfollow:
-export const handleUserFollowAndUnfollow = async(req,res)=>{
+// handlePostUserFollowAndUnfollow:
+export const handlePostUserFollowAndUnfollow = async(req,res)=>{
     try {
         
         const myId = req.id; // my id -> user id
@@ -220,8 +221,8 @@ export const handleUserFollowAndUnfollow = async(req,res)=>{
             });
         }
 
-        const user = User.findById(myId);
-        const targetUser = User.findById(targetUserId);
+        const user = await User.findById(myId);
+        const targetUser = await User.findById(targetUserId);
 
         if(!user || !targetUser){
             return res.status(400).json({
