@@ -1,4 +1,4 @@
-import {v1 as cloudinary} from "cloudinary";
+import {v2 as cloudinary} from "cloudinary";
 import dontenv from "dotenv";
 
 dontenv.config();
