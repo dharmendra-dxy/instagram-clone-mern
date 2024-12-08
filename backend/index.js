@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 
 import connectDB from "./utils/db.js";
 
+import userRoute from "./routes/user.routes.js";
+
 dotenv.config();
 
 const app = express();
@@ -29,12 +31,10 @@ app.use(cors(corsOption));
 
 
 // route:
-app.get("/", (req,res)=>{
-    return res.status(200).json({
-        message: "Hi, from backend",
-        success: true,
-    });
-});
+app.use("/api/v1/user", userRoute);
+
+
+
 
 
 app.listen(PORT, ()=> {
