@@ -182,3 +182,84 @@ export const handleUserEditProfile = async (req,res) => {
         console.log("error: ", error);
     }
 }
+
+// handleGetSuggestedUser:
+export const handleGetSuggestedUser = async (req,res) => {
+    try {
+        
+        const suggestedUser = await User.find({_id:{$ne: req.id}}).select('-password');
+        if(!suggestedUser){
+            return res.status(400).json({
+                message: "Currently do not have any user",
+                success: false,
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            suggestedUser,
+        });
+
+    } catch (error) {
+        console.log("error: ", error);
+    }
+}
+
+
+// handleUserFollowAndUnfollow:
+export const handleUserFollowAndUnfollow = async(req,res)=>{
+    try {
+        
+        const myId = req.id; // my id -> user id
+        const targetUserId = req.params.id;  // other user id-> user will follow
+
+        if(myId == targetUserId){
+            return res.status(400).json({
+                message: "You can't follow/unfollow yourself",
+                success: false,
+            });
+        }
+
+        const user = User.findById(myId);
+        const targetUser = User.findById(targetUserId);
+
+        if(!user || !targetUser){
+            return res.status(400).json({
+                message: "user not found",
+                success: false,
+            });
+        }
+
+        // check to be followed or unfollowed:
+        const isFollowing = user.following.includes(targetUserId);
+        if(isFollowing){
+            // unfollow targetUser:
+            await Promise.all([
+                User.updateOne({_id:myId}, {$pull: {following: targetUserId}}),
+                User.updateOne({_id:targetUserId}, {$pull: {followers: myId}}),
+            ]);
+
+            return res.status(200).json({
+                message: "Unfollowed successfully",
+                success: true,
+            });
+        }
+        else{
+            // follow targetUser:
+            await Promise.all([
+                User.updateOne({_id:myId}, {$push: {following: targetUserId}}),
+                User.updateOne({_id:targetUserId}, {$push: {followers: myId}}),
+            ]);
+
+            return res.status(200).json({
+                message: "followed successfully",
+                success: true,
+            });
+        }
+
+        
+
+    } catch (error) {
+        console.log("error: ", error);
+    }
+}
