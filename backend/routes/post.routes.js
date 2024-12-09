@@ -13,7 +13,7 @@ import {
     handleGetAllPost,
     handleGetUserAllPost,
     handleLikePosts,
-} from "../controllers/post.controller";
+} from "../controllers/post.controller.js";
 
 
 const router = express.Router();

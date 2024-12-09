@@ -1,7 +1,7 @@
 import sharp from "sharp";
 import cloudinary from "../utils/coudinary.js";
 
-import Post from "../models/post.model";
+import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import Comment from "../models/comment.model.js";
 import { populate } from "dotenv";

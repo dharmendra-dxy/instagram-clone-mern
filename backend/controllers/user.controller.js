@@ -2,8 +2,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import User from "../models/user.model.js";
+import Post from "../models/post.model.js";
 import getDataUri from "../utils/datauri.utils.js";
 import cloudinary from "../utils/coudinary.js";
+
 
 
 // handlePostUserRegister:
@@ -43,7 +45,7 @@ export const handlePostUserRegister = async (req,res)=>{
 
 
     } catch (error) {
-        console.log("Error: ", error);
+        console.log("Error1: ", error);
     }
 }
 
@@ -78,6 +80,18 @@ export const handlePostUserLogin = async (req,res) => {
             });
         }
 
+        
+        // populate each post if in the posts array
+        const populatedPosts = await Promise.all(
+            user.posts.map( async (postId) => {
+                const post = await Post.findById(postId);
+                if(post.author.equals(user._id)){
+                    return post;
+                }
+                return null;
+            })
+        )
+
         // user object to be handled in front-end:
         user = {
             _id: user._id,
@@ -87,14 +101,13 @@ export const handlePostUserLogin = async (req,res) => {
             bio: user.bio ,
             followers: user.followers,
             following: user.following,
-            posts: user.posts,
-
+            posts: populatedPosts,
         }
-
 
         // if user has correct email and pass:
         // create token:
         const token = await jwt.sign({userId: user._id}, process.env.SECRET_KEY, {expiresIn: '1d'});
+
 
         // set cookies and return:
         return res.cookie('token', token, {httpOnly: true, sameSite:'strict', maxAge:1*24*60*60*1000}).json({
@@ -104,7 +117,7 @@ export const handlePostUserLogin = async (req,res) => {
         });
 
     } catch (error) {
-        console.log("Error: ", error);
+        console.log("Error2: ", error);
         
     }
 }
@@ -118,7 +131,7 @@ export const handleGetUserLogout = async (req,res) => {
             success: true, 
         })
     } catch (error) {
-        console.log("Error: ", error);
+        console.log("Error3: ", error);
     }
 }
 
