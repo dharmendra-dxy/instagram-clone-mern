@@ -219,6 +219,7 @@ export const handleAddComment = async (req,res)=>{
     }
 }
 
+
 // handleGetAllCommentsOfPost:
 export const handleGetAllCommentsOfPost = async (req,res) => {
     try {
@@ -242,6 +243,7 @@ export const handleGetAllCommentsOfPost = async (req,res) => {
         console.log("error: ",error);
     }
 }
+
 
 // handleDeletePost:
 export const handleDeletePost = async (req,res) => {
